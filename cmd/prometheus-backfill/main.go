@@ -15,13 +15,22 @@ import (
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	iapi "github.com/influxdata/influxdb-client-go/v2/api"
+	"github.com/mtulio/prometheus-backfill/pkg/backfill"
+)
+
+var (
+	DefaultBackendBufferSize uint64 = 10000
+	DefaultInputBufferSize   uint64 = 10000
+	DefaultParserBufferSize  uint64 = 10000
 )
 
 func main() {
 
+	options := new(backfill.Options)
+
 	fInTarget := flag.String("i", "/path/to/directory", "input file or directory")
 	fOutTarget := flag.String("o", "influxdb=address=db=username=pass", "output address")
-	fBatchSz := flag.Uint64("b", 10000, "Batch size")
+	fBatchSz := flag.Uint64("b", DefaultParserBufferSize, "Batch size")
 	flag.Parse()
 
 	if *fInTarget == "" {
@@ -32,6 +41,8 @@ func main() {
 		fmt.Errorf("Missing argument out target: -o")
 		return
 	}
+
+	options.SetBackendBufferSize(*fBatchSz)
 
 	stg, err := NewStorageInfluxDB(*fBatchSz)
 	if err != nil {
