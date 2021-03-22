@@ -7,14 +7,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	iapi "github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/mtulio/prometheus-backfill/pkg/backfill"
 )
 
@@ -26,47 +23,53 @@ var (
 
 func main() {
 
-	options := new(backfill.Options)
+	opts := new(backfill.Options)
 
-	fInTarget := flag.String("i", "/path/to/directory", "input file or directory")
-	fOutTarget := flag.String("o", "influxdb=address=db=username=pass", "output address")
-	fBatchSz := flag.Uint64("b", DefaultParserBufferSize, "Batch size")
+	//fInTarget := flag.String("i", "/path/to/directory", "input file or directory")
+	//fOutTarget := flag.String("o", "influxdb=address=db=username=pass", "output address")
+	//fBatchSz := flag.Uint64("b", DefaultParserBufferSize, "Batch size")
+	opts.FInTarget = flag.String("i", "/path/to/directory", "input file or directory")
+	opts.FOutTarget = flag.String("o", "influxdb=address=db=username=pass", "output address")
+	opts.FBatchSz = flag.Uint64("b", DefaultParserBufferSize, "Batch size")
 	flag.Parse()
+	opts.FlagParse()
 
-	if *fInTarget == "" {
-		fmt.Errorf("Missing argument in target: -i")
-		return
-	}
-	if *fOutTarget == "" {
-		fmt.Errorf("Missing argument out target: -o")
-		return
-	}
+	// if *fInTarget == "" {
+	// 	fmt.Errorf("Missing argument in target: -i")
+	// 	return
+	// }
+	// if *fOutTarget == "" {
+	// 	fmt.Errorf("Missing argument out target: -o")
+	// 	return
+	// }
 
-	options.SetBackendBufferSize(*fBatchSz)
+	// opts.SetBackendBufferSize(*fBatchSz)
 
-	stg, err := NewStorageInfluxDB(*fBatchSz)
-	if err != nil {
-		log.Fatal("Error launching storage")
-	}
+	// stg, err := NewStorageInfluxDB(*fBatchSz)
+	// if err != nil {
+	// 	log.Fatal("Error launching storage")
+	// }
 
-	resp := stg.Parser([]byte("Marco"))
-	fmt.Println(resp)
-	start(stg)
+	// resp := stg.Parser([]byte("Marco"))
+	// fmt.Println(resp)
+	// start(stg)
 
-	outParams := strings.Split(*fOutTarget, "=")
-	fmt.Println(outParams)
+	// outParams := strings.Split(*fOutTarget, "=")
+	// fmt.Println(outParams)
 
-	client := influxdb2.NewClientWithOptions(
-		outParams[1], fmt.Sprintf("%s:%s", outParams[3], outParams[4]),
-		influxdb2.DefaultOptions().SetBatchSize(uint(*fBatchSz)),
-	)
+	client := backfill.NewStorageClient()
+
+	// client := influxdb2.NewClientWithOptions(
+	// 	outParams[1], fmt.Sprintf("%s:%s", outParams[3], outParams[4]),
+	// 	influxdb2.DefaultOptions().SetBatchSize(uint(*fBatchSz)),
+	// )
 	defer client.Close()
-	writeAPI := client.WriteAPI("default", outParams[2])
+	//writeAPI := client.WriteAPI("default", outParams[2])
 
-	buf, _ := parseGZ(*fInTarget)
+	buf, _ := parseGZ(*opts.FInTarget)
 
-	parseJSON(buf, writeAPI)
-	writeAPI.Flush()
+	parseJSON(buf, client)
+	//writeAPI.Flush()
 }
 
 func start(stg interface{}) error {
@@ -118,8 +121,9 @@ type PrometheusResponse struct {
 	} `json:"data"`
 }
 
-func parseJSON(buf []byte, writeAPI iapi.WriteAPI) error {
+func parseJSON(buf []byte, client *Storage) error {
 	// Unmarshal using a generic interface
+	//writeAPI
 	fmt.Println("Parsing...")
 	var genericJSON PrometheusResponse
 	err := json.Unmarshal(buf, &genericJSON)
@@ -149,7 +153,8 @@ func parseJSON(buf []byte, writeAPI iapi.WriteAPI) error {
 				},
 				ts)
 
-			writeAPI.WritePoint(p)
+			//writeAPI.WritePoint(p)
+			client.WritePoint(p)
 		}
 		if ttPoints%10000 == 0 {
 			fmt.Printf("Total metrics: %d\n", ttMetrics)
