@@ -15,7 +15,7 @@ type StorageClient struct {
 func NewStorageClientWithOptions(opts *Options) (*StorageClient, error) {
 	sc := StorageClient{options: opts}
 
-	if sc.options.outStorageType == "influxdb" {
+	if sc.options.outType == "influxdb" {
 		stg, err := storage.NewStorageInfluxDB(
 			sc.options.outStorageAddr,
 			sc.options.outStorageDb,
@@ -29,5 +29,5 @@ func NewStorageClientWithOptions(opts *Options) (*StorageClient, error) {
 		return &sc, nil
 	}
 
-	return nil, errors.New(fmt.Sprintf("Error Creating Storage Client: Unknow storage type %s", sc.options.outStorageType))
+	return nil, errors.New(fmt.Sprintf("Error Creating Storage Client: Unknow storage type %s", sc.options.outType))
 }

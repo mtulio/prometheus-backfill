@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"time"
+
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
 	influxdb2api "github.com/influxdata/influxdb-client-go/v2/api"
 	"github.com/influxdata/influxdb-client-go/v2/api/write"
@@ -36,4 +38,17 @@ func (si *StorageInfluxDB) Close() error {
 func (si *StorageInfluxDB) Writer(p interface{}) error {
 	si.clientWAPI.WritePoint(p.(*write.Point))
 	return nil
+}
+
+func (si *StorageInfluxDB) NewPoint(
+	name string,
+	labels map[string]string,
+	values map[string]interface{},
+	timestamp time.Time,
+) interface{} {
+	return influxdb2.NewPoint(
+		name,
+		labels,
+		values,
+		timestamp)
 }

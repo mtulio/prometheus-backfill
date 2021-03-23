@@ -3,6 +3,7 @@ package backfill
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -12,13 +13,18 @@ type Options struct {
 	parserBufferSize  uint64
 
 	// param ArgOutTarget: stgType=address=db=user=pass
-	outStorageType string
+	outType        string
 	outStorageAddr string
 	outStorageDb   string
 	outStorageAuth string
 
-	ArgInTarget  *string
-	ArgOutTarget *string
+	// param ArgIn: stgType=address=db=user=pass
+	inType string
+	inPath string
+
+	ArgIn        *string
+	ArgInExt     *string
+	ArgOut       *string
 	ArgBatchSize *uint64
 }
 
@@ -50,11 +56,35 @@ func (o *Options) SetParserBufferSize(value uint64) *Options {
 }
 
 func (o *Options) Parse() error {
-	stgParams := strings.Split(*o.ArgOutTarget, "=")
-	if len(stgParams) != 5 {
-		return errors.New("Error on -i argument. Expect: stgType=address=db=user=pass")
+
+	// Fill Input flow argument (ArgIn)
+	inParams := strings.Split(*o.ArgIn, "=")
+	if len(inParams) > 1 {
+		return errors.New("Error on -i argument. Expect format: /path/to/file")
 	}
-	o.outStorageType = stgParams[0]
+
+	if _, err := os.Stat(*o.ArgIn); os.IsNotExist(err) {
+		return errors.New(fmt.Sprintf("Does not exists: %s", *o.ArgIn))
+	}
+
+	fi, err := os.Stat(*o.ArgIn)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Stat error: %s", err))
+	}
+
+	switch mode := fi.Mode(); {
+	case mode.IsDir():
+		o.inType = "directory"
+	case mode.IsRegular():
+		o.inType = "file"
+	}
+
+	// Fill Storage argument (ArgOut)
+	stgParams := strings.Split(*o.ArgOut, "=")
+	if len(stgParams) != 5 {
+		return errors.New("Error on -o argument. Expect format: stgType=address=db=user=pass")
+	}
+	o.outType = stgParams[0]
 	o.outStorageAddr = stgParams[1]
 	o.outStorageDb = stgParams[2]
 	o.outStorageAuth = fmt.Sprintf("%s:%s", stgParams[3], stgParams[4])

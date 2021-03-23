@@ -2,7 +2,8 @@ package backfill
 
 type Backfill struct {
 	options *Options
-	stg     *StorageClient
+	scli    *StorageClient
+	pcli    *ParserClient
 }
 
 func NewBackfill() *Backfill {
@@ -12,27 +13,34 @@ func NewBackfill() *Backfill {
 func NewBackfillWithOptions(opts *Options) (*Backfill, error) {
 	bf := Backfill{options: opts}
 
-	stg, err := NewStorageClientWithOptions(opts)
+	sc, err := NewStorageClientWithOptions(opts)
 	if err != nil {
 		return nil, err
 	}
-	bf.stg = stg
+	bf.scli = sc
 
+	pc, err := NewParserWithOptions(opts, sc)
+	if err != nil {
+		return nil, err
+	}
+	bf.pcli = pc
 	return &bf, nil
 }
 
 func (b *Backfill) Close() {
-	if b.stg.client != nil {
-		b.stg.client.Close()
+	if b.scli.client != nil {
+		b.scli.client.Close()
 	}
 	return
 }
 
 func (b *Backfill) StartParser() error {
-	buf, err := parseGzipFile(*b.options.ArgInTarget)
-	if err != nil {
-		return err
-	}
-	parseBuffer(buf, b.stg)
+	// buf, err := parseGzipFile(*b.options.ArgIn)
+	// if err != nil {
+	// 	return err
+	// }
+	// parseBuffer(buf, b.stg)
+
+	b.pcli.parser.Parse()
 	return nil
 }
