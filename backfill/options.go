@@ -12,13 +12,13 @@ type Options struct {
 	inputBufferSize   uint64
 	parserBufferSize  uint64
 
-	// param ArgOutTarget: stgType=address=db=user=pass
+	// parsed from param ArgOutTarget: stgType=address=db=user=pass
 	outType        string
 	outStorageAddr string
 	outStorageDb   string
 	outStorageAuth string
 
-	// param ArgIn: stgType=address=db=user=pass
+	// parsed from param ArgIn: /path/to/file_or_dir
 	inType string
 
 	ArgIn        *string
