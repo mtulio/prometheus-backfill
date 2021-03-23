@@ -1,4 +1,4 @@
-module mtulio/prometheus-backfill
+module github.com/mtulio/prometheus-backfill
 
 go 1.16
 
