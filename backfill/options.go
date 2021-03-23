@@ -20,7 +20,6 @@ type Options struct {
 
 	// param ArgIn: stgType=address=db=user=pass
 	inType string
-	inPath string
 
 	ArgIn        *string
 	ArgInExt     *string
