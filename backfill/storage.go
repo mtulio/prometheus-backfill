@@ -29,7 +29,7 @@ func NewStorageClientWithOptions(opts *Options) (*StorageClient, error) {
 		return &sc, nil
 	} else if sc.options.outType == "remote" {
 		stg, err := storage.NewStorageRemote(
-			"remote", sc.options.(*ArgOut)
+			"remote", sc.options.(*ArgOut),
 		)
 		if err != nil {
 			return nil, errors.New(fmt.Sprintf("Error Creating Storage Client: %v", err))
