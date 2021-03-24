@@ -12,6 +12,9 @@ REGISTRY_USER ?= mtulio
 GH_REPO ?= $(APP)
 IMAGE ?= $(REGISTRY)/$(REGISTRY_USER)/$(GH_REPO)/$(APP):$(VER_COMMIT)
 
+mod-update:
+	go mod tidy
+
 build:
 	go build -o $(BIN)/$(APP) $(PROJECT)/cmd/$(APP)
 

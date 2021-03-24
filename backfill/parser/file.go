@@ -128,6 +128,7 @@ func (p *FileParser) Parser(buf []byte) error {
 		promJson.Status, promJson.Data.ResultType,
 		len(promJson.Data.Result))
 	log.Println("Processing data points...")
+
 	for idxM := range promJson.Data.Result {
 		ttMetrics += 1
 		for idxP := range promJson.Data.Result[idxM].Values {
@@ -151,4 +152,18 @@ func (p *FileParser) Parser(buf []byte) error {
 	}
 	log.Printf("Processed %d data points\n", ttPoints)
 	return nil
+}
+
+func (p *FileParser) ParserRemote(buf []byte) error {
+
+	var promJson PrometheusResponse
+	// var streams []*model.SampleStream
+
+	err := json.Unmarshal(buf, &promJson)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return p.scli.Writer(promJson.Data.Result)
+
 }
