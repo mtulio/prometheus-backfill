@@ -46,7 +46,7 @@ docker pull docker.pkg.github.com/mtulio/prometheus-backfill/prometheus-backfill
 
 ## Usage
 
-### `prometheus-backfill`
+### tool `prometheus-backfill`
 
 `./bin/prometheus-backfill -h`
 
@@ -86,9 +86,7 @@ podman run --rm \
     -o "influxdb=http://localhost:8086=prometheus=admin=Super$ecret"
 ~~~
 
-### As packages
-
-> TODO
+### Packages
 
 You can customize a input parser/processor and the output storage, or use the default. Just see the package [backfill](./backfill/)
 
