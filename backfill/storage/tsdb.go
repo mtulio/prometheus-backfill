@@ -1,12 +1,4 @@
 package storage
 
-// func NewStorageTSDB(batchSize uint64) (*StorageTSDB, error) {
-// 	return &StorageTSDB{
-// 		MaxBatchSize: batchSize,
-// 	}, nil
-// }
-
-// func (st *StorageTSDB) Parser(b []byte) error {
-
-// 	return nil
-// }
+// The idea here is to create tsdb blocks to Prometheus similar to:
+// https://github.com/prometheus/prometheus/blob/main/cmd/promtool/backfill.go
