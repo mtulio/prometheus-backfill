@@ -88,7 +88,12 @@ podman run --rm \
 
 ### Packages
 
-You can customize a input parser/processor and the output storage, or use the default. Just see the package [backfill](./backfill/)
+You can customize a input parser/processor and the output storage, or use the default. Just see the package [backfill](./backfill/).
+
+Just a few ideas to use a custom package:
+- Customize from a custom metric format to write to Proemtheus Storage
+- Create a pipeline processing input metrics to a Prometheus Storage
+- ...
 
 ## Roadmap / How to Contribute
 

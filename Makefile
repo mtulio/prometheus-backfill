@@ -1,5 +1,5 @@
 
-CONTAINER_CMD ?= sudo podman
+CONTAINER_CMD ?= podman
 BIN_DIR ?= ./bin
 PROJECT ?=  github.com/mtulio/prometheus-backfill
 APP ?= prometheus-backfill
@@ -19,8 +19,8 @@ build:
 
 container-build:
 	$(CONTAINER_CMD) build -t $(IMAGE) -f Dockerfile .
-	$(CONTAINER_CMD) tag $(IMAGE) $(BASE_IMAGE):latest
+	# $(CONTAINER_CMD) tag $(IMAGE) $(BASE_IMAGE):latest
 
 container-push:
 	$(CONTAINER_CMD) push $(IMAGE)
-	$(CONTAINER_CMD) push $(BASE_IMAGE):latest
+	# $(CONTAINER_CMD) push $(BASE_IMAGE):latest
