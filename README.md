@@ -14,14 +14,16 @@ The IO support are the following (TODO is not in development ATM):
 
 Supported **input**:
 - compressed json file from Prometheus' API
-- JSON file (TODO)
-- CSV (TODO)
+- JSON file*
+- CSV*
 
 Supported **output**:
 - InfluxDB
-- Prometheus remote storage (TODO native implementation)
-- Prometheus TSDB (TODO)
-- Elasticsearch (TODO)
+- Prometheus remote storage* (using native implementation)
+- Prometheus TSDB*
+- Elasticsearch*
+
+'* TODO, not developed yet.
 
 ## Install
 
