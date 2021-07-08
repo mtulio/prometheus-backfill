@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	"strings"
 
 	"github.com/mtulio/prometheus-backfill/backfill/storage"
 )
@@ -61,7 +62,7 @@ func (p *FileParser) Parse() error {
 			continue
 		}
 		//parseBuffer(buf, p.scli)
-		err = p.Parser(buf)
+		err = p.Parser(buf, f)
 		if err != nil {
 			log.Println("Error parsing %v\n", err)
 		}
@@ -111,7 +112,7 @@ func (p *FileParser) Reader(f string) ([]byte, error) {
 }
 
 // Reader reads a file from disk, unpacking it if needed
-func (p *FileParser) Parser(buf []byte) error {
+func (p *FileParser) Parser(buf []byte, fname string) error {
 
 	var (
 		promJson  PrometheusResponse
@@ -127,14 +128,24 @@ func (p *FileParser) Parser(buf []byte) error {
 	log.Printf("JSON parsed: status=%s, ResultType=%s, #Labels=%d\n",
 		promJson.Status, promJson.Data.ResultType,
 		len(promJson.Data.Result))
+
 	log.Println("Processing data points...")
+
 	for idxM := range promJson.Data.Result {
 		ttMetrics += 1
 		for idxP := range promJson.Data.Result[idxM].Values {
 			ttPoints += 1
 			ts := time.Unix(int64(promJson.Data.Result[idxM].Values[idxP][0].(float64)), 0)
 			value, _ := strconv.ParseFloat(promJson.Data.Result[idxM].Values[idxP][1].(string), 64)
+
 			name := promJson.Data.Result[idxM].Metric["__name__"]
+			if name == "" {
+				// Forcing a name, when raw data comes from custom queries
+				// Extracting 'filename' from FQDN: /path/to/filename.gz
+				filename := strings.Split(fname, "/")
+				name = strings.Split(filename[len(filename)-1], ".")[0]
+				promJson.Data.Result[idxM].Metric["__name__"] = name
+			}
 
 			p.scli.Writer(p.scli.NewPoint(
 				name,

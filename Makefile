@@ -10,7 +10,9 @@ VER_COMMIT := $(shell git rev-parse --short HEAD)
 REGISTRY ?= docker.pkg.github.com
 REGISTRY_USER ?= mtulio
 GH_REPO ?= $(APP)
-BASE_IMAGE ?= $(REGISTRY)/$(REGISTRY_USER)/$(GH_REPO)/$(APP)
+BASE_IMAGE_GH ?= $(REGISTRY)/$(REGISTRY_USER)/$(GH_REPO)/$(APP)
+BASE_IMAGE_QUAY ?= quay.io/mtulio/$(APP)
+BASE_IMAGE ?= $(BASE_IMAGE_QUAY)
 IMAGE ?= $(BASE_IMAGE):$(VER_COMMIT)
 
 build:
@@ -19,8 +21,8 @@ build:
 
 container-build:
 	$(CONTAINER_CMD) build -t $(IMAGE) -f Dockerfile .
-	# $(CONTAINER_CMD) tag $(IMAGE) $(BASE_IMAGE):latest
+	$(CONTAINER_CMD) tag $(IMAGE) $(BASE_IMAGE):latest
 
 container-push:
 	$(CONTAINER_CMD) push $(IMAGE)
-	# $(CONTAINER_CMD) push $(BASE_IMAGE):latest
+	$(CONTAINER_CMD) push $(BASE_IMAGE):latest
