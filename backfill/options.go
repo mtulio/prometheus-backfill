@@ -99,12 +99,12 @@ func (o *Options) ParseArgOut() error {
 
 func (o *Options) Parse() error {
 
-	err := ParseArgIn()
+	err := o.ParseArgIn()
 	if err != nil {
 		return err
 	}
 
-	err := ParseArgOut()
+	err = o.ParseArgOut()
 	if err != nil {
 		return err
 	}
