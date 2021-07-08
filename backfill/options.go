@@ -54,8 +54,8 @@ func (o *Options) SetParserBufferSize(value uint64) *Options {
 	return o
 }
 
-func (o *Options) Parse() error {
-
+// ParseArgIn parse input argument and check if it exists on FS.
+func (o *Options) ParseArgIn() error {
 	// Fill Input flow argument (ArgIn)
 	inParams := strings.Split(*o.ArgIn, "=")
 	if len(inParams) > 1 {
@@ -78,7 +78,11 @@ func (o *Options) Parse() error {
 		o.inType = "file"
 	}
 
-	// Fill Storage argument (ArgOut)
+	return nil
+}
+
+// ParseArgOut parse output argument and split into backend conn params.
+func (o *Options) ParseArgOut() error {
 	stgParams := strings.Split(*o.ArgOut, "=")
 	if len(stgParams) != 5 {
 		return errors.New("Error on -o argument. Expect format: stgType=address=db=user=pass")
@@ -89,6 +93,21 @@ func (o *Options) Parse() error {
 	o.outStorageAuth = fmt.Sprintf("%s:%s", stgParams[3], stgParams[4])
 
 	o.backendBufferSize = uint64(*o.ArgBatchSize)
+
+	return nil
+}
+
+func (o *Options) Parse() error {
+
+	err := ParseArgIn()
+	if err != nil {
+		return err
+	}
+
+	err := ParseArgOut()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

@@ -128,6 +128,7 @@ func (p *FileParser) Parser(buf []byte) error {
 		promJson.Status, promJson.Data.ResultType,
 		len(promJson.Data.Result))
 	log.Println("Processing data points...")
+
 	for idxM := range promJson.Data.Result {
 		ttMetrics += 1
 		for idxP := range promJson.Data.Result[idxM].Values {
